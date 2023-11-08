@@ -31,6 +31,7 @@ class ModeControl:
         mode_tab = ttk.Frame(self.root)
         self.root.notebook.add(mode_tab, text = self.name)
 
+        # Estabilish Modes as Notebook
         sub_notebook = ttk.Notebook(mode_tab)
         sub_notebook.pack(fill = 'both', expand = True)
 
@@ -64,10 +65,55 @@ class ModeControl:
             relay_button.grid(row=i, column=0, sticky = 'w')
             state_menu.grid(row=i, column=1, sticky='w')
 
-            relay_button.config(command = lambda p=pin, s=state_var: self.toggle_rellay(p, s))
+            relay_button.config(command = lambda p=pin, s=state_var: self.toggle_relay(p, s))
 
             self.relay_buttons.append(relay_button)
             self.relay_menus.append(state_menu)
+
+        # Set up Pump Control tab
+        pump_frame = tk.Frame(sub_notebook)
+        sub_notebook.add(pump_frame, text = 'Pump Control')
+        image_label = tk.Label(pump_frame, image = self.pump_photo)
+
+        for i in range(1,7):
+            prime_button = tk.Button(pump_frame, text=f"Prime {i}", command=lambda num=i: prime_pump(num))
+            prime_button.grid(row = i-1, column = 0, padx = 10, sticky = 'w')
+
+            purge_button = tk.Button(pump_frame, text=f"Purge {i}", command=lambda num=i: toggle_purge_pump(num))
+            purge_button.grid(row = i-1, column = 1, padx = 10, sticky = 'w')
+
+        def prime_pump(self, pump_number):
+            channel = self.root.pump_channels[pump_number - 1]
+            GPIO.output(channel, GPIO.HIGH)
+            update_image_visibility()
+            self.root.root.after(3000, lambda: stop_prime_pump(pump_number))
+
+        def stop_prime_pump(pump_number):
+            channel = self.root.pump_channels[pump_number - 1]
+            GPIO.output(channel, GPIO.LOW)
+            update_image_visibility()
+
+        def toggle_purge_pump(pump_number):
+            channel = self.root.pump_channels[pump_number - 1]
+            if GPIO.input(channel) == GPIO.LOW:
+                GPIO.output(channel, GPIO.HIGH)
+            else:
+                GPIO.ouput(channel, GPIO.LOW)
+            update_image_visibility()
+
+        def update_image_visibility():
+            active_pumps = [i + 1 for i, channel in enumerate(self.root.pump_channels) if GPIO.input(channel) == GPIO.HIGH]
+
+            # Remove existing image labels
+            for i in range(6):
+                if self.root.image_labels[i]:
+                    self.root.image_labels[i].grid_forget()
+
+            # Create image labels next to active buttons
+            for pump_number in active_pumps:
+                image_label = tk.Label(pump_frame, image=self.root.pump_photo)
+                image_label.grid(row = pump_number - 1, column = 2)
+                self.root.image_labels[pump_number - 1] = image_label
 
 
 
@@ -84,9 +130,15 @@ class App:
         self.relay_pins = [2, 3, 4, 5, 6, 7, 8, 9, 14, 15]
         self.pump_channels = [12, 16, 20, 21, 22, 27]
 
+        # Pump function values
+        self.image_labels = [None] * 6
+        self.pump_photo = PhotoImage(file = "/home/JakeH/Pictures/pump.png")
+
         GPIO.setmode(GPIO.BCM)
         self.setup_pins()
         self.create_modes()
+
+        self.root.mainloop()
 
     def setup_pins(self):
         for pin in self.pump_channels + self.relay_pins:
@@ -106,6 +158,7 @@ class App:
     def exit_program(self):
         GPIO.cleanup()
         self.root.destroy()
+
 
 
 
