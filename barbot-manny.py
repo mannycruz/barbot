@@ -3,6 +3,110 @@ import tkinter as tk
 from tkinter import ttk
 from tkinter import PhotoImage
 
+#### SETUP MODE CLASS:
+#### SETUP MODE TAB FRAME AND
+#### SETUP RELAY CONTROL FRAME WITHIN TAB
+
+class ModeControl:
+    def __init__(self, root, name):
+        self.root = root
+        self.name = name
+        self.relay_buttons = []
+        self.relay_menus = []
+        self.setup_ui()
+
+    def toggle_all_relays(self):
+        for pin in self.root.relay_pins[:8]:
+            GPIO.output(pin, not GPIO.input(pin))
+
+    def toggle_relay(self, pin, state_var):
+        if state_var.get() == "Momentary":
+            GPIO.output(pin, GPIO.HIGH)
+            self.root.after(100, lambda p=pin: GPIO.output(pin, GPIO.LOW))
+        else:
+            GPIO.output(pin, not GPIO.input(pin))
+
+    def setup_ui(self):
+        # Set up Test or Bar mode tabs
+        mode_tab = ttk.Frame(self.root)
+        self.root.notebook.add(mode_tab, text = self.name)
+
+        # Set up Relay Control tab for mode
+        relay_frame = ttk.Frame(self.root.notebook)
+        self.root.notebook.add(relay_frame, text = 'Relay Control')
+
+        # Toggle all Relay Buttons
+        all_relay_buttons = tk.Button(
+            relay_frame,
+            text = "Toggle All Relays 1-8",
+            command = self.toggle_all_relays ### Might be wrong
+        )
+
+        # Place relay buttons on grid
+        all_relay_buttons.grid(
+            row = len(self.root.relay_pins),
+            column = 0,
+            columnspan = 2,
+            sticky = 'w'
+        )
+
+        # Set up Momentary/Permanent drop down menus
+        for i, pin in enumerate(reversed(self.root.relay_pins)):
+            relay_button = tk.Button(relay_frame, text = f"Relay {i + 1}")
+
+            state_var = tk.StringVar()
+            state_var.set("Momentary")
+            state_menu = tk.OptionMenu(relay_frame, state_var, "Momentary", "Permanent")
+
+            relay_button.grid(row=i, column=0, sticky = 'w')
+            state_menu.grid(row=i, column=1, sticky='w')
+
+            relay_button.config(command = lambda p=pin, s=state_var: self.toggle_rellay(p, s))
+
+            self.relay_buttons.append(relay_button)
+            self.relay_menus.append(state_menu)
+
+
+
+##### SETUP THE GUI
+
+class App:
+    def __init__(self):
+        self.root = tk.Tk()
+        self.root.title("Control Panel")
+
+        self.notebook = ttk.Notebook(self.root)
+        self.notebook.pack(fill = 'both', expand = True)
+
+        self.relay_pins = [2, 3, 4, 5, 6, 7, 8, 9, 14, 15]
+        self.pump_channels = [12, 16, 20, 21, 22, 27]
+
+        GPIO.setmode(GPIO.BCM)
+        self.setup_pins()
+        self.create_modes()
+
+    def setup_pins(self):
+        for pin in self.pump_channels + self.relay_pins:
+            GPIO.setup(pin, GPIO.OUT)
+            GPIO.output(pin, GPIO.LOW)
+
+    def create_modes(self):
+        modes = ["Test Mode", "Bar Mode", "Mixer Options", "Bottle Options"]
+
+        for mode_name in modes:
+            if mode_name in ["Test Mode", "Bar Mode"]:
+                ModeControl(self, mode_name)
+
+        exit_button = tk.Button(self.root, text="Exit", command=lambda: self.exit_program())        
+        exit_button.grid(row = len(self.relay_pins) + 1, column = 0, columnspan = 2, sticky = 'w')
+
+    def exit_program(self):
+        GPIO.cleanup()
+        self.root.destroy()
+
+
+
+
 ###### SAFETIES
 
 # Safety flag to prevent motor control actions
