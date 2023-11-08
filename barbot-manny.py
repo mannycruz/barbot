@@ -31,9 +31,12 @@ class ModeControl:
         mode_tab = ttk.Frame(self.root)
         self.root.notebook.add(mode_tab, text = self.name)
 
+        sub_notebook = ttk.Notebook(mode_tab)
+        sub_notebook.pack(fill = 'both', expand = True)
+
         # Set up Relay Control tab for mode
-        relay_frame = ttk.Frame(self.root.notebook)
-        self.root.notebook.add(relay_frame, text = 'Relay Control')
+        relay_frame = ttk.Frame(sub_notebook)
+        sub_notebook.add(relay_frame, text = 'Relay Control')
 
         # Toggle all Relay Buttons
         all_relay_buttons = tk.Button(
