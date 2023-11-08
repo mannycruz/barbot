@@ -1,4 +1,3 @@
-from barbot import toggle_all_relays
 import RPi.GPIO as GPIO
 import tkinter as tk
 from tkinter import ttk
