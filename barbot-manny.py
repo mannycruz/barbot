@@ -53,6 +53,11 @@ def setup_pins():
             GPIO.setup(channel, GPIO.OUT)
             GPIO.setup(channel, GPIO.LOW)
 
+    initialize_pump_pins()
+    initialize_relay_pins()
+    initialize_stepper_pins()
+    initialize_pump_control_gpio()
+
 
 ##### SETUP GUI
 
