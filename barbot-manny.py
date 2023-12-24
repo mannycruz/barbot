@@ -77,17 +77,33 @@ class ModeControl:
         else:
             self.status_label.config(text="Direction: Left")
 
-    def toggle_stepper_direction(self):
+    def toggle_stepper_direction(self): # < - I think this command should also go somewhere else since it's performing an action and not setting up the GUI
         if self.stepper_enabled:
             self.stepper_direction = not self.stepper_direction
             GPIO.output(dir_pin, self.stepper_direction)
             self.update_status_label()
 
-    def toggle_stepper_motor(self): #< ----- I THINK THESE COMMANDS SHOULD GO SOMEWHERE ELSE NOT IN THE GUI STEP
+    def toggle_stepper_motor(self): #< ----- I THINK THESE COMMANDS SHOULD GO SOMEWHERE ELSE NOT IN THE GUI STEP (later problem)
         if self.stepper_enabled:
             GPIO.output(enable_pin, GPIO.HIGH)
-            self.stepper_enabled = False
+            self.stepper_enabled = False # Disable the stepper motor
+            self.stepper_direction_button.config(state="disabled")
+            self.step_rate_combobox.config(state="disabled")
+            self.step_rate_button.config(state="disabled")
+            self.stepper_move_button.config(state="disabled")
+            self.update_status_label()
+        else:
+            GPIO.output(enable_pin, GPIO.LOW)
+            self.stepper_enabled = True # Enable the stepper motor
+            self.stepper_direction_button.config(state="normal")
+            self.step_rate_combobox.config(state="normal")
+            self.step_rate_button.config(state="normal")
+            self.stepper_move_button.config(state="normal")
+            self.update_status_label()
 
+    def change_step_rate(self):
+        if self.stepper_enabled:
+            self.step_rate = int(self.step_rate.combobox.get())
 
     def setup_ui(self):
         # Set up Test or Bar mode tabs
