@@ -170,11 +170,11 @@ class ModeControl:
         self.status_label.grid(row=1, column=0, columnspan=2, sticky='w')
 
         # Create buttons for stepper motor control in the stepper frame
-        self.stepper_direction_button = tk.Button(stepper_frame, text = "Toggle Stepper Direction", command=toggle_stepper_direction, state="disabled")
+        self.stepper_direction_button = tk.Button(stepper_frame, text = "Toggle Stepper Direction", command=self.toggle_stepper_direction, state="disabled")
         self.stepper_direction_button.grid(row=2, column=0, columnspan=2, sticky='w')
-        self.stepper_enable_button = tk.Button(self.stepper_frame, text="Toggle Stepper Enable", command=toggle_stepper_motor, state="normal")
+        self.stepper_enable_button = tk.Button(self.stepper_frame, text="Toggle Stepper Enable", command=self.toggle_stepper_motor, state="normal")
         self.stepper_enable_button.grid(row = 0, column = 0, columnspan = 2, sticky = 'w')
-        self.stepper_move_button = tk.Button(stepper_frame, text = "Move Stepper", command = move_stepper_motor, state = "normal")
+        self.stepper_move_button = tk.Button(stepper_frame, text = "Move Stepper", command = self.move_stepper_motor, state = "normal")
         self.stepper_move_button.grid(row=6, column=0, columnspan=2, sticky='w')
 
         # Create an exit button in stepper frame
