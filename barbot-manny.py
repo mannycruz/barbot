@@ -181,6 +181,19 @@ class ModeControl:
         exit_stepper_button = tk.Button(stepper_frame, text="Exit", command=self.app.exit_program)
         exit_stepper_button.grid(row=7, column=0, columnspan=2, sticky='w')
 
+        # Create step rate label
+        self.step_rate_label = tk.Label(stepper_frame, text = "Step rate (ms):")
+        self.step_rate_label.grid(row=3, column=0, columnspan=2, sticky='w') # Place label in the grid
+
+        # Create a Combobox widget for step rate selection
+        step_rate_combobox = ttk.Combobox(stepper_frame, values = [str(i) for i in range(1,11)], state="normal")
+        step_rate_combobox.set(str(self.step_rate))
+        step_rate_combobox.grid(row=4, column=0, columnspan=2, sticky='w') # Place the combobox in the grid
+
+        # Create step rate button
+        self.step_rate_button = tk.Button(stepper_frame, text = "Set Step Rate", command = self.change_step_rate, state = "normal")
+        self.step_rate_button.grid(row=5, column=0, columnspan=2, sticky='w')
+
 
 
 ##### SETUP THE GUI
