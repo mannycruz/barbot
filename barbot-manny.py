@@ -194,6 +194,59 @@ class ModeControl:
         self.step_rate_button = tk.Button(stepper_frame, text = "Set Step Rate", command = self.change_step_rate, state = "normal")
         self.step_rate_button.grid(row=5, column=0, columnspan=2, sticky='w')
 
+class MixerOptions:
+    def __init__(self, app, name):
+        self.app = app
+        self.name = name
+        self.mixer_options = ["Soda Water", "Tonic Water", "Coke", "Orange Juice", "Pineapple Juice", "Marg Mix"]
+        self.mixer_buttons = {}
+
+        self.setup_ui()
+
+    def setup_ui(self):
+        # Create the tab for Mixer Options
+        mode_tab = ttk.Frame(self.app.notebook)
+        self.app.notebook.add(mode_tab, text="Mixer Options")
+
+        # Create buttons for each mixer option in the mixer options tab
+        for option in self.mixer_options:
+            mixer_button = tk.Button(mode_tab, text=option, state="normal", bg="red")
+            mixer_button.pack()
+            self.mixer_buttons.append(mixer_button)
+
+            # Bind single-click to toggle red color, and double-click to toggle green color
+            mixer_button.bind("<Button-1>", lambda event, button=mixer_button: self.toggle_opion_color(button))
+            mixer_button.bind("<Double-1>", lambda event, button=mixer_button: self.toggle_option_color(button))
+
+class BottleOptions:
+    def __init__(self, app, name):
+        self.app = app
+        self.name = name
+        self.bottle_options = ["Vodka", "Rum", "White Rum", "Tequila", "Gin", "Whiskey", "Triple Sec", "Surpuss", "Peach Schnapps", "Amaretto", "Chambord", "Lemoncello", "Grenadine"]
+        self.bottle_buttons = {}
+
+        self.bottle_relay_mapping = {}
+
+        self.setup_ui()
+
+    def toggle_option_color(self, option):
+        label, _ = self.bottle_buttons[option]
+        if label.cget("bg") == "red":
+            label.config(bg="green")
+        else:
+            label.config(bg="red")
+
+    def assign_bottle_to_relay(self, option, relay_number, label):
+        if relay_number == 0:
+            for i in range(1, len(self.bottle_options) + 1):
+                bottle_relay_
+
+    def setup_ui(self):
+        # Create the tab for Bottle options
+        mode_tab = ttk.Frame(self.app.notebook)
+        self.app.notebook.add(mode_tab, text = "Bottle Options")
+
+        # Create buttons for each mixer option in the mixer options tab
 
 
 ##### SETUP THE GUI
@@ -228,7 +281,7 @@ class App:
             if mode_name in ["Test Mode", "Bar Mode"]:
                 ModeControl(self, mode_name)
 
-        exit_button = tk.Button(self.root, text="Exit", command=lambda: self.exit_program())        
+        exit_button = tk.Button(self.root, text="Exit", command=lambda: self.exit_program)        
         exit_button.grid(row = len(self.relay_pins) + 1, column = 0, columnspan = 2, sticky = 'w')
 
     def exit_program(self):
@@ -236,6 +289,7 @@ class App:
         self.root.destroy()
 
 if __name__ == "__main__":
+    # Initialize app
     app = App()
     app.root.mainloop()
 
