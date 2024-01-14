@@ -20,17 +20,14 @@ step_rate = 10  # Initialize step rate
 bottle_relay_mapping = {}
 
 
-####### GLOBAL VARIABLES
-
-global pump_channels
-pump_channels = [12, 16, 20, 21, 22, 27]
-
-####### GPIO SETUP FUNCTIONS
-
-## everything related to GPIO and everything 
-## it needs should be defined in here I think...
-
-## GPIO outputs
+# GPIO Setup
+def initialize_gpio():
+    GPIO.setmode(GPIO.BCM)
+    initialize_pump_channels()
+    initialize_relay_pins()
+    initialize_stepper_pins()
+    initialize_pump_control_gpio()
+    
 
 # Initialize GPIO channels for pumps 1 to 6 as outputs
 # Initialize the pump channels as outputs and set them to LOW
@@ -65,39 +62,6 @@ def initialize_pump_control_gpio():
     for channel in pump_channels:
         GPIO.setup(channel, GPIO.OUT)
         GPIO.output(channel, GPIO.LOW)
-
-# Modify images -- called after button is pressed
-def update_image_visibility():
-    # Define image labels
-    # Create a PhotoImage object to display the image
-    photo = PhotoImage(file="/home/JakeH/Pictures/pump.png")
-
-    # Create a Label widget to display the image
-    image_label = tk.Label(pump_frame, image=photo)
-
-    # Create a list to store image labels for active pumps
-    image_labels = [None] * 6
-
-    active_pumps = [i + 1 for i, channel in enumerate(pump_channels) if GPIO.input(channel) == GPIO.HIGH]
-
-    # Remove existing image labels
-    for i in range(6):
-        if image_labels[i]:
-            image_labels[i].grid_forget()
-
-    # Create image labels next to active buttons
-    for pump_number in active_pumps:
-        image_label = tk.Label(pump_frame, image=photo)
-        image_label.grid(row=pump_number - 1, column=2)
-        image_labels[pump_number - 1] = image_label
-
-# GPIO Setup
-def initialize_gpio():
-    GPIO.setmode(GPIO.BCM)
-    initialize_pump_channels()
-    initialize_relay_pins()
-    initialize_stepper_pins()
-    initialize_pump_control_gpio()
 
 ######def update_image_visibility():
 ######    # ...
@@ -425,6 +389,22 @@ def create_gui():
 
     # Create a list to store image labels for active pumps
     image_labels = [None] * 6
+
+    # Function to update the image visibility based on pump status
+    def update_image_visibility():
+        active_pumps = [i + 1 for i, channel in enumerate(pump_channels) if GPIO.input(channel) == GPIO.HIGH]
+
+        # Remove existing image labels
+        for i in range(6):
+            if image_labels[i]:
+                image_labels[i].grid_forget()
+
+        # Create image labels next to active buttons
+        for pump_number in active_pumps:
+            image_label = tk.Label(pump_frame, image=photo)
+            image_label.grid(row=pump_number - 1, column=2)
+            image_labels[pump_number - 1] = image_label
+
 
 
     root.mainloop()
